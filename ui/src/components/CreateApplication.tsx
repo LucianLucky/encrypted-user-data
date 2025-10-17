@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { useEthersSigner } from '../hooks/useEthersSigner';
 import { CONTRACT_ADDRESS, CONTRACT_ABI } from '../config/contracts';
+import { COUNTRIES, getCitiesForCountry } from '../config/locations';
 import { Contract } from 'ethers';
 
 export function CreateApplication() {
@@ -17,6 +18,41 @@ export function CreateApplication() {
   const [message, setMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
+  const cityOptions = useMemo(() => {
+    const parsed = Number.parseInt(country, 10);
+    if (Number.isNaN(parsed) || parsed === 0) {
+      return [];
+    }
+    return getCitiesForCountry(parsed);
+  }, [country]);
+
+  const disableCitySelection = useMemo(() => {
+    const parsed = Number.parseInt(country, 10);
+    return Number.isNaN(parsed) || parsed === 0;
+  }, [country]);
+
+  useEffect(() => {
+    const parsedCountry = Number.parseInt(country, 10);
+    if (Number.isNaN(parsedCountry) || parsedCountry === 0) {
+      if (city !== '0') {
+        setCity('0');
+      }
+      return;
+    }
+
+    if (!cityOptions.length) {
+      if (city !== '0') {
+        setCity('0');
+      }
+      return;
+    }
+
+    const exists = cityOptions.some((option) => option.id.toString() === city);
+    if (!exists) {
+      setCity(cityOptions[0].id.toString());
+    }
+  }, [country, city, cityOptions]);
+
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setMessage('');
@@ -27,13 +63,53 @@ export function CreateApplication() {
     setSubmitting(true);
     try {
       const contract = new Contract(CONTRACT_ADDRESS, CONTRACT_ABI, await signerPromise);
+      const countryId = Number.parseInt(country, 10);
+      const cityId = Number.parseInt(city, 10);
+
+      if (Number.isNaN(countryId) || Number.isNaN(cityId)) {
+        throw new Error('Invalid location selection');
+      }
+
+      const minSalaryValue = minSalary.trim() === '' ? '0' : minSalary;
+      const maxSalaryValue = maxSalary.trim() === '' ? '0' : maxSalary;
+
+      let minSalaryBig: bigint;
+      let maxSalaryBig: bigint;
+      try {
+        minSalaryBig = BigInt(minSalaryValue);
+      } catch (error) {
+        throw new Error('Enter a valid minimum salary');
+      }
+      try {
+        maxSalaryBig = BigInt(maxSalaryValue);
+      } catch (error) {
+        throw new Error('Enter a valid maximum salary');
+      }
+
+      if (maxSalaryBig !== 0n && minSalaryBig !== 0n && maxSalaryBig < minSalaryBig) {
+        throw new Error('Maximum salary must be greater than minimum salary');
+      }
+
+      const minYearValue = minYear.trim() === '' ? '0' : minYear;
+      const maxYearValue = maxYear.trim() === '' ? '0' : maxYear;
+
+      const minYearNumber = Number.parseInt(minYearValue, 10);
+      const maxYearNumber = Number.parseInt(maxYearValue, 10);
+
+      if (Number.isNaN(minYearNumber) || Number.isNaN(maxYearNumber)) {
+        throw new Error('Enter valid birth year limits');
+      }
+      if (maxYearNumber !== 0 && minYearNumber !== 0 && maxYearNumber < minYearNumber) {
+        throw new Error('Maximum birth year must be greater than minimum birth year');
+      }
+
       const tx = await contract.createApplication(
-        parseInt(country),
-        parseInt(city),
-        BigInt(minSalary),
-        BigInt(maxSalary),
-        parseInt(minYear),
-        parseInt(maxYear)
+        countryId,
+        cityId,
+        minSalaryBig,
+        maxSalaryBig,
+        minYearNumber,
+        maxYearNumber
       );
       await tx.wait();
       setMessage('Application created');
@@ -49,24 +125,35 @@ export function CreateApplication() {
       <h3>Create Application</h3>
       <form onSubmit={onSubmit} style={{ display: 'grid', gap: 12, maxWidth: 500 }}>
         <label style={fieldStyle}>
-          <span>Country Id (0 ignore)</span>
-          <input
-            placeholder="country id (0 ignore)"
+          <span>Country</span>
+          <select
             value={country}
-            onChange={e=>setCountry(e.target.value)}
+            onChange={e => setCountry(e.target.value)}
             style={inputStyle}
-            inputMode="numeric"
-          />
+          >
+            <option value="0">Any country</option>
+            {COUNTRIES.map((option) => (
+              <option key={option.id} value={option.id.toString()}>
+                {option.name}
+              </option>
+            ))}
+          </select>
         </label>
         <label style={fieldStyle}>
-          <span>City Id (0 ignore)</span>
-          <input
-            placeholder="city id (0 ignore)"
+          <span>City</span>
+          <select
             value={city}
-            onChange={e=>setCity(e.target.value)}
+            onChange={e => setCity(e.target.value)}
             style={inputStyle}
-            inputMode="numeric"
-          />
+            disabled={disableCitySelection}
+          >
+            <option value="0">Any city</option>
+            {cityOptions.map((option) => (
+              <option key={option.id} value={option.id.toString()}>
+                {option.name}
+              </option>
+            ))}
+          </select>
         </label>
         <label style={fieldStyle}>
           <span>Minimum Salary (0 ignore)</span>
