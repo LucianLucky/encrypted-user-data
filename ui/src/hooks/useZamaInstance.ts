@@ -1,25 +1,43 @@
-import { useEffect, useState } from 'react';
-import { createInstance, type FhevmInstance, SepoliaConfig } from '@zama-fhe/relayer-sdk/web';
+import { useState, useEffect } from 'react';
+import { createInstance,initSDK,SepoliaConfig } from '@zama-fhe/relayer-sdk/bundle';
 
 export function useZamaInstance() {
-  const [instance, setInstance] = useState<FhevmInstance | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [instance, setInstance] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let mounted = true;
-    (async () => {
+
+    const initZama = async () => {
       try {
-        const inst = await createInstance(SepoliaConfig);
-        if (mounted) setInstance(inst);
-      } catch (e:any) {
-        if (mounted) setError(e?.message || 'Failed to init Zama instance');
+        setIsLoading(true);
+        setError(null);
+        await initSDK()
+
+        const zamaInstance = await createInstance(SepoliaConfig);
+
+        if (mounted) {
+          setInstance(zamaInstance);
+        }
+      } catch (err) {
+        console.error('Failed to initialize Zama instance:', err);
+        if (mounted) {
+          setError('Failed to initialize encryption service');
+        }
       } finally {
-        if (mounted) setLoading(false);
+        if (mounted) {
+          setIsLoading(false);
+        }
       }
-    })();
-    return () => { mounted = false; };
+    };
+
+    initZama();
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
-  return { instance, isLoading: loading, error };
+  return { instance, isLoading, error };
 }

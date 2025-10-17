@@ -1,7 +1,7 @@
 // IMPORTANT: Copy the ABI from deployments/sepolia/EncryptedUserData.json after deployment.
 // Do not import JSON files in frontend per requirements.
 
-export const CONTRACT_ADDRESS = ""; // Fill with deployed address on Sepolia
+export const CONTRACT_ADDRESS = "0xff90C732Ae74a5C1269Ae0B016e81F504A9F968e"; // Fill with deployed address on Sepolia
 
 // ABI copied from compile output of EncryptedUserData.sol (identical to deployments JSON's abi field)
 export const CONTRACT_ABI = [
