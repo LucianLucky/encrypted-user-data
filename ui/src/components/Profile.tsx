@@ -4,6 +4,7 @@ import { useAccount, usePublicClient } from 'wagmi';
 import { useEthersSigner } from '../hooks/useEthersSigner';
 import { useZamaInstance } from '../hooks/useZamaInstance';
 import { CONTRACT_ADDRESS, CONTRACT_ABI } from '../config/contracts';
+import { getCountryNameById, getCityNameById } from '../config/locations';
 
 type RawUserData = {
   username: string;
@@ -142,6 +143,26 @@ export function Profile() {
     return String(value);
   }
 
+  function extractNumber(value: unknown): number | null {
+    if (typeof value === 'bigint') {
+      if (value > BigInt(Number.MAX_SAFE_INTEGER) || value < BigInt(Number.MIN_SAFE_INTEGER)) {
+        return null;
+      }
+      return Number(value);
+    }
+    if (typeof value === 'number') {
+      if (!Number.isFinite(value)) {
+        return null;
+      }
+      return Math.trunc(value);
+    }
+    if (typeof value === 'string') {
+      const parsed = Number.parseInt(value, 10);
+      return Number.isNaN(parsed) ? null : parsed;
+    }
+    return null;
+  }
+
   async function onDecrypt() {
     if (!rawUser || !instance || !signerPromise || !CONTRACT_ADDRESS) {
       setStatus('Missing encryption context or wallet');
@@ -197,12 +218,23 @@ export function Profile() {
         durationDays
       );
 
+      const rawCountryValue = response[rawUser.countryHandle];
+      const rawCityValue = response[rawUser.cityHandle];
+      const rawSalaryValue = response[rawUser.salaryHandle];
+      const rawBirthYearValue = response[rawUser.birthYearHandle];
+
+      const countryNumeric = extractNumber(rawCountryValue);
+      const cityNumeric = extractNumber(rawCityValue);
+
+      const countryName = countryNumeric != null ? getCountryNameById(countryNumeric) : null;
+      const cityName = cityNumeric != null ? getCityNameById(cityNumeric) : null;
+
       const decryptedData: DecryptedUserData = {
         username: rawUser.username,
-        country: formatValue(response[rawUser.countryHandle]),
-        city: formatValue(response[rawUser.cityHandle]),
-        salary: formatValue(response[rawUser.salaryHandle]),
-        birthYear: formatValue(response[rawUser.birthYearHandle]),
+        country: countryName ?? formatValue(rawCountryValue),
+        city: cityName ?? formatValue(rawCityValue),
+        salary: formatValue(rawSalaryValue),
+        birthYear: formatValue(rawBirthYearValue),
       };
 
       setDecrypted(decryptedData);
