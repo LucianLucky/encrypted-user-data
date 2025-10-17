@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import type { CSSProperties } from 'react';
 import { useAccount } from 'wagmi';
 import { useEthersSigner } from '../hooks/useEthersSigner';
 import { useZamaInstance } from '../hooks/useZamaInstance';
@@ -9,6 +10,8 @@ export function RegisterUser() {
   const { address } = useAccount();
   const signerPromise = useEthersSigner();
   const { instance, isLoading: zamaLoading } = useZamaInstance();
+  const fieldStyle: CSSProperties = { display: 'grid', gap: 4, textAlign: 'left' };
+  const inputStyle: CSSProperties = { padding: '8px 10px', borderRadius: 4, border: '1px solid #d1d5db' };
   const [username, setUsername] = useState('');
   const [countryId, setCountryId] = useState('');
   const [cityId, setCityId] = useState('');
@@ -61,15 +64,58 @@ export function RegisterUser() {
     <div>
       <h3>Register User</h3>
       <form onSubmit={onSubmit} style={{ display: 'grid', gap: 12, maxWidth: 500 }}>
-        <input placeholder="username" value={username} onChange={e=>setUsername(e.target.value)} />
-        <input placeholder="country id" value={countryId} onChange={e=>setCountryId(e.target.value)} />
-        <input placeholder="city id" value={cityId} onChange={e=>setCityId(e.target.value)} />
-        <input placeholder="annual salary" value={salary} onChange={e=>setSalary(e.target.value)} />
-        <input placeholder="birth year" value={birthYear} onChange={e=>setBirthYear(e.target.value)} />
+        <label style={fieldStyle}>
+          <span>Username</span>
+          <input
+            placeholder="username"
+            value={username}
+            onChange={e=>setUsername(e.target.value)}
+            style={inputStyle}
+          />
+        </label>
+        <label style={fieldStyle}>
+          <span>Country Id</span>
+          <input
+            placeholder="country id"
+            value={countryId}
+            onChange={e=>setCountryId(e.target.value)}
+            style={inputStyle}
+            inputMode="numeric"
+          />
+        </label>
+        <label style={fieldStyle}>
+          <span>City Id</span>
+          <input
+            placeholder="city id"
+            value={cityId}
+            onChange={e=>setCityId(e.target.value)}
+            style={inputStyle}
+            inputMode="numeric"
+          />
+        </label>
+        <label style={fieldStyle}>
+          <span>Annual Salary</span>
+          <input
+            placeholder="annual salary"
+            value={salary}
+            onChange={e=>setSalary(e.target.value)}
+            style={inputStyle}
+            inputMode="numeric"
+          />
+        </label>
+        <label style={fieldStyle}>
+          <span>Birth Year</span>
+          <input
+            placeholder="birth year"
+            value={birthYear}
+            onChange={e=>setBirthYear(e.target.value)}
+            style={inputStyle}
+            inputMode="numeric"
+          />
+        </label>
         <button disabled={submitting || zamaLoading} type="submit">{submitting? 'Submitting...':'Submit'}</button>
       </form>
       {message && <p>{message}</p>}
     </div>
   );
 }
-

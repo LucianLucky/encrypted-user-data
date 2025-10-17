@@ -1,10 +1,13 @@
 import { useState } from 'react';
+import type { CSSProperties } from 'react';
 import { useEthersSigner } from '../hooks/useEthersSigner';
 import { CONTRACT_ADDRESS, CONTRACT_ABI } from '../config/contracts';
 import { Contract } from 'ethers';
 
 export function CreateApplication() {
   const signerPromise = useEthersSigner();
+  const fieldStyle: CSSProperties = { display: 'grid', gap: 4, textAlign: 'left' };
+  const inputStyle: CSSProperties = { padding: '8px 10px', borderRadius: 4, border: '1px solid #d1d5db' };
   const [country, setCountry] = useState('0');
   const [city, setCity] = useState('0');
   const [minSalary, setMinSalary] = useState('0');
@@ -45,16 +48,69 @@ export function CreateApplication() {
     <div>
       <h3>Create Application</h3>
       <form onSubmit={onSubmit} style={{ display: 'grid', gap: 12, maxWidth: 500 }}>
-        <input placeholder="country id (0 ignore)" value={country} onChange={e=>setCountry(e.target.value)} />
-        <input placeholder="city id (0 ignore)" value={city} onChange={e=>setCity(e.target.value)} />
-        <input placeholder="min salary (0 ignore)" value={minSalary} onChange={e=>setMinSalary(e.target.value)} />
-        <input placeholder="max salary (0 ignore)" value={maxSalary} onChange={e=>setMaxSalary(e.target.value)} />
-        <input placeholder="min birth year (0 ignore)" value={minYear} onChange={e=>setMinYear(e.target.value)} />
-        <input placeholder="max birth year (0 ignore)" value={maxYear} onChange={e=>setMaxYear(e.target.value)} />
+        <label style={fieldStyle}>
+          <span>Country Id (0 ignore)</span>
+          <input
+            placeholder="country id (0 ignore)"
+            value={country}
+            onChange={e=>setCountry(e.target.value)}
+            style={inputStyle}
+            inputMode="numeric"
+          />
+        </label>
+        <label style={fieldStyle}>
+          <span>City Id (0 ignore)</span>
+          <input
+            placeholder="city id (0 ignore)"
+            value={city}
+            onChange={e=>setCity(e.target.value)}
+            style={inputStyle}
+            inputMode="numeric"
+          />
+        </label>
+        <label style={fieldStyle}>
+          <span>Minimum Salary (0 ignore)</span>
+          <input
+            placeholder="min salary (0 ignore)"
+            value={minSalary}
+            onChange={e=>setMinSalary(e.target.value)}
+            style={inputStyle}
+            inputMode="numeric"
+          />
+        </label>
+        <label style={fieldStyle}>
+          <span>Maximum Salary (0 ignore)</span>
+          <input
+            placeholder="max salary (0 ignore)"
+            value={maxSalary}
+            onChange={e=>setMaxSalary(e.target.value)}
+            style={inputStyle}
+            inputMode="numeric"
+          />
+        </label>
+        <label style={fieldStyle}>
+          <span>Minimum Birth Year (0 ignore)</span>
+          <input
+            placeholder="min birth year (0 ignore)"
+            value={minYear}
+            onChange={e=>setMinYear(e.target.value)}
+            style={inputStyle}
+            inputMode="numeric"
+          />
+        </label>
+        <label style={fieldStyle}>
+          <span>Maximum Birth Year (0 ignore)</span>
+          <input
+            placeholder="max birth year (0 ignore)"
+            value={maxYear}
+            onChange={e=>setMaxYear(e.target.value)}
+            style={inputStyle}
+            inputMode="numeric"
+          />
+        </label>
         <button disabled={submitting} type="submit">{submitting? 'Submitting...':'Submit'}</button>
       </form>
       {message && <p>{message}</p>}
     </div>
   );
 }
-

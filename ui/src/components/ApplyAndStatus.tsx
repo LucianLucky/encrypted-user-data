@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import type { CSSProperties } from 'react';
 import { useAccount, usePublicClient } from 'wagmi';
 import { useEthersSigner } from '../hooks/useEthersSigner';
 import { CONTRACT_ADDRESS, CONTRACT_ABI } from '../config/contracts';
@@ -10,6 +11,8 @@ export function ApplyAndStatus() {
   const publicClient = usePublicClient();
   const { address } = useAccount();
   const { instance } = useZamaInstance();
+  const fieldStyle: CSSProperties = { display: 'grid', gap: 4, textAlign: 'left' };
+  const inputStyle: CSSProperties = { padding: '8px 10px', borderRadius: 4, border: '1px solid #d1d5db' };
   const [appId, setAppId] = useState('');
   const [message, setMessage] = useState('');
   const [encryptedResult, setEncryptedResult] = useState<string>('');
@@ -79,8 +82,17 @@ export function ApplyAndStatus() {
   return (
     <div>
       <h3>Apply & Check Result</h3>
-      <form onSubmit={onApply} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-        <input placeholder="application id" value={appId} onChange={e=>setAppId(e.target.value)} />
+      <form onSubmit={onApply} style={{ display: 'flex', gap: 8, alignItems: 'flex-end', flexWrap: 'wrap' }}>
+        <label style={{ ...fieldStyle, minWidth: 160 }}>
+          <span>Application Id</span>
+          <input
+            placeholder="application id"
+            value={appId}
+            onChange={e=>setAppId(e.target.value)}
+            style={inputStyle}
+            inputMode="numeric"
+          />
+        </label>
         <button type="submit">Apply</button>
         <button type="button" onClick={onCheck}>Check</button>
       </form>
