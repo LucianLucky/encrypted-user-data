@@ -23,23 +23,122 @@ type DecryptedUserData = {
   birthYear: string;
 };
 
-const fieldStyle: CSSProperties = {
+const cardContainerStyle: CSSProperties = {
   display: 'grid',
-  gap: 4,
-  textAlign: 'left',
+  gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+  gap: '1.5rem',
+  maxWidth: '1000px',
+  margin: '0 auto',
+};
+
+const infoCardStyle: CSSProperties = {
+  background: 'var(--bg-primary)',
+  borderRadius: 'var(--radius-lg)',
+  padding: '1.5rem',
+  border: '1px solid var(--border-color)',
+  boxShadow: 'var(--shadow-md)',
+  transition: 'all 0.3s ease',
+};
+
+const fieldStyle: CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '0.5rem',
+};
+
+const labelStyle: CSSProperties = {
+  fontSize: '0.75rem',
+  fontWeight: 600,
+  textTransform: 'uppercase',
+  letterSpacing: '0.05em',
+  color: 'var(--text-tertiary)',
 };
 
 const valueStyle: CSSProperties = {
-  padding: '8px 10px',
-  backgroundColor: '#f3f4f6',
-  borderRadius: 4,
-  border: '1px solid #d1d5db',
+  padding: '0.875rem 1rem',
+  background: 'var(--bg-secondary)',
+  borderRadius: 'var(--radius-md)',
+  border: '1px solid var(--border-color)',
+  fontSize: '1rem',
+  fontWeight: 500,
+  color: 'var(--text-primary)',
+  fontFamily: 'monospace',
+  letterSpacing: '0.5px',
 };
 
-const layoutStyle: CSSProperties = {
-  display: 'grid',
-  gap: 16,
-  maxWidth: 520,
+const headerSectionStyle: CSSProperties = {
+  marginBottom: '2rem',
+  textAlign: 'center',
+};
+
+const titleStyle: CSSProperties = {
+  fontSize: '2rem',
+  fontWeight: 700,
+  marginBottom: '0.5rem',
+  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+  WebkitBackgroundClip: 'text',
+  WebkitTextFillColor: 'transparent',
+  backgroundClip: 'text',
+};
+
+const subtitleStyle: CSSProperties = {
+  fontSize: '1rem',
+  color: 'var(--text-secondary)',
+};
+
+const buttonContainerStyle: CSSProperties = {
+  display: 'flex',
+  gap: '1rem',
+  justifyContent: 'center',
+  marginTop: '2rem',
+};
+
+const primaryButtonStyle: CSSProperties = {
+  padding: '0.875rem 2rem',
+  fontSize: '1rem',
+  fontWeight: 600,
+  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+  border: 'none',
+  borderRadius: 'var(--radius-md)',
+  color: 'white',
+  cursor: 'pointer',
+  boxShadow: 'var(--shadow-md)',
+  transition: 'all 0.3s ease',
+};
+
+const statusBadgeStyle = (registered: boolean): CSSProperties => ({
+  display: 'inline-block',
+  padding: '0.5rem 1rem',
+  borderRadius: 'var(--radius-md)',
+  fontSize: '0.875rem',
+  fontWeight: 600,
+  background: registered ? 'var(--success-color)' : 'var(--warning-color)',
+  color: 'white',
+  boxShadow: 'var(--shadow-sm)',
+});
+
+const loadingStyle: CSSProperties = {
+  textAlign: 'center',
+  padding: '3rem',
+  color: 'var(--text-secondary)',
+  fontSize: '1.125rem',
+};
+
+const emptyStateStyle: CSSProperties = {
+  textAlign: 'center',
+  padding: '3rem',
+  color: 'var(--text-secondary)',
+};
+
+const statusMessageStyle: CSSProperties = {
+  marginTop: '1.5rem',
+  padding: '1rem',
+  background: 'var(--bg-secondary)',
+  borderRadius: 'var(--radius-md)',
+  border: '1px solid var(--border-color)',
+  textAlign: 'center',
+  color: 'var(--text-primary)',
+  fontWeight: 500,
 };
 
 export function Profile() {
@@ -255,47 +354,112 @@ export function Profile() {
 
   return (
     <div>
-      <h3>User Profile</h3>
-      {!address && <p>Connect wallet to load your profile.</p>}
-      {address && (
-        <div style={layoutStyle}>
-          {loading && <p>Loading profile...</p>}
-          {zamaError && <p>{zamaError}</p>}
-          {rawUser && !loading && (
-            <>
-              <label style={fieldStyle}>
-                <span>Username</span>
-                <span style={valueStyle}>{displayUsername || '***'}</span>
-              </label>
-              <label style={fieldStyle}>
-                <span>Country</span>
-                <span style={valueStyle}>{displayCountry || '***'}</span>
-              </label>
-              <label style={fieldStyle}>
-                <span>City</span>
-                <span style={valueStyle}>{displayCity || '***'}</span>
-              </label>
-              <label style={fieldStyle}>
-                <span>Annual Salary</span>
-                <span style={valueStyle}>{displaySalary || '***'}</span>
-              </label>
-              <label style={fieldStyle}>
-                <span>Birth Year</span>
-                <span style={valueStyle}>{displayBirthYear || '***'}</span>
-              </label>
-              <label style={fieldStyle}>
-                <span>Status</span>
-                <span style={valueStyle}>{rawUser.registered ? 'Registered' : 'Not Registered'}</span>
-              </label>
-            </>
-          )}
-          <div style={{ display: 'flex', gap: 12 }}>
-            <button onClick={onDecrypt} disabled={isDecryptDisabled || decrypting || zamaLoading}>
-              {decrypting ? 'Decrypting...' : 'Decrypt' }
-            </button>
-          </div>
-          {status && <p>{status}</p>}
+      <div style={headerSectionStyle}>
+        <h2 style={titleStyle}>👤 User Profile</h2>
+        <p style={subtitleStyle}>View and manage your encrypted user data</p>
+      </div>
+
+      {!address && (
+        <div style={emptyStateStyle}>
+          <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🔐</div>
+          <h3>Connect Your Wallet</h3>
+          <p>Please connect your wallet to view your profile.</p>
         </div>
+      )}
+
+      {address && (
+        <>
+          {loading && (
+            <div style={loadingStyle}>
+              <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⏳</div>
+              <p>Loading your profile...</p>
+            </div>
+          )}
+
+          {zamaError && (
+            <div style={{ ...statusMessageStyle, borderColor: 'var(--danger-color)', background: '#fef2f2' }}>
+              <span style={{ color: 'var(--danger-color)' }}>⚠️ {zamaError}</span>
+            </div>
+          )}
+
+          {rawUser && !loading && (
+            <div className="fade-in">
+              <div style={cardContainerStyle}>
+                <div style={infoCardStyle} className="slide-in">
+                  <div style={fieldStyle}>
+                    <span style={labelStyle}>Username</span>
+                    <div style={valueStyle}>{displayUsername || '***'}</div>
+                  </div>
+                </div>
+
+                <div style={infoCardStyle} className="slide-in">
+                  <div style={fieldStyle}>
+                    <span style={labelStyle}>Country</span>
+                    <div style={valueStyle}>{displayCountry || '***'}</div>
+                  </div>
+                </div>
+
+                <div style={infoCardStyle} className="slide-in">
+                  <div style={fieldStyle}>
+                    <span style={labelStyle}>City</span>
+                    <div style={valueStyle}>{displayCity || '***'}</div>
+                  </div>
+                </div>
+
+                <div style={infoCardStyle} className="slide-in">
+                  <div style={fieldStyle}>
+                    <span style={labelStyle}>Annual Salary</span>
+                    <div style={valueStyle}>{displaySalary || '***'}</div>
+                  </div>
+                </div>
+
+                <div style={infoCardStyle} className="slide-in">
+                  <div style={fieldStyle}>
+                    <span style={labelStyle}>Birth Year</span>
+                    <div style={valueStyle}>{displayBirthYear || '***'}</div>
+                  </div>
+                </div>
+
+                <div style={infoCardStyle} className="slide-in">
+                  <div style={fieldStyle}>
+                    <span style={labelStyle}>Status</span>
+                    <div>
+                      <span style={statusBadgeStyle(rawUser.registered)}>
+                        {rawUser.registered ? '✓ Registered' : '○ Not Registered'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div style={buttonContainerStyle}>
+                <button
+                  onClick={onDecrypt}
+                  disabled={isDecryptDisabled || decrypting || zamaLoading}
+                  style={primaryButtonStyle}
+                  onMouseEnter={(e) => {
+                    if (!isDecryptDisabled && !decrypting && !zamaLoading) {
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                      e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+                  }}
+                >
+                  {decrypting ? '🔓 Decrypting...' : '🔑 Decrypt Data'}
+                </button>
+              </div>
+
+              {status && (
+                <div style={statusMessageStyle} className="fade-in">
+                  {status}
+                </div>
+              )}
+            </div>
+          )}
+        </>
       )}
     </div>
   );
