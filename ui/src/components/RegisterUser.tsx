@@ -63,6 +63,7 @@ export function RegisterUser() {
   return (
     <div>
       <h3>Register User</h3>
+      <p>All your data is encrypted by Zama.</p>
       <form onSubmit={onSubmit} style={{ display: 'grid', gap: 12, maxWidth: 500 }}>
         <label style={fieldStyle}>
           <span>Username</span>

@@ -3,9 +3,10 @@ import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { RegisterUser } from './RegisterUser';
 import { CreateApplication } from './CreateApplication';
 import { ApplyAndStatus } from './ApplyAndStatus';
+import { Profile } from './Profile';
 
 export function AppShell() {
-  const [tab, setTab] = useState<'register' | 'create' | 'apply'>('register');
+  const [tab, setTab] = useState<'register' | 'create' | 'apply' | 'profile'>('register');
   return (
     <div style={{ maxWidth: '900px', margin: '0 auto', padding: '24px' }}>
       <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
@@ -17,12 +18,13 @@ export function AppShell() {
         <button onClick={() => setTab('register')} style={{ padding: '8px 12px', border: '1px solid #ddd', background: tab==='register'?'#eef':'#fff' }}>Register</button>
         <button onClick={() => setTab('create')} style={{ padding: '8px 12px', border: '1px solid #ddd', background: tab==='create'?'#eef':'#fff' }}>Create Application</button>
         <button onClick={() => setTab('apply')} style={{ padding: '8px 12px', border: '1px solid #ddd', background: tab==='apply'?'#eef':'#fff' }}>Apply & Status</button>
+        <button onClick={() => setTab('profile')} style={{ padding: '8px 12px', border: '1px solid #ddd', background: tab==='profile'?'#eef':'#fff' }}>Profile</button>
       </nav>
 
       {tab === 'register' && <RegisterUser />}
       {tab === 'create' && <CreateApplication />}
       {tab === 'apply' && <ApplyAndStatus />}
+      {tab === 'profile' && <Profile />}
     </div>
   );
 }
-
