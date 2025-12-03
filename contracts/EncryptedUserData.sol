@@ -2,12 +2,12 @@
 pragma solidity ^0.8.24;
 
 import {FHE, ebool, euint16, euint32, euint64, externalEuint16, externalEuint32, externalEuint64} from "@fhevm/solidity/lib/FHE.sol";
-import {SepoliaConfig} from "@fhevm/solidity/config/ZamaConfig.sol";
+import {ZamaEthereumConfig} from "@fhevm/solidity/config/ZamaConfig.sol";
 
 /// @title Encrypted User Data and Application Matching
 /// @notice Stores user data with FHE and evaluates application constraints fully on-chain producing an encrypted result
 /// @dev Username is plaintext. Country/city/salary/birthYear are encrypted. All comparisons are done with FHE.
-contract EncryptedUserData is SepoliaConfig {
+contract EncryptedUserData is ZamaEthereumConfig {
     struct User {
         string username; // plaintext, per requirements
         euint32 country; // encrypted
